@@ -1,0 +1,75 @@
+# DataSay 语音克隆平台依赖包（适配 CUDA 12.1 + PyTorch 2.3.1 环境）
+# --------------------------------------------
+# 基础框架（与文件1完全一致）
+fastapi==0.115.6
+uvicorn[standard]==0.30.0
+pydantic==2.7.0  # 文件1锁定版本，避免冲突
+pydantic-settings==2.1.0
+
+# 数据库（无冲突，保持原样）
+sqlalchemy[asyncio]==2.0.23
+asyncpg==0.29.0
+alembic==1.13.1
+
+# 认证和安全（无冲突，保持原样）
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+flask==3.0.2
+
+# 异步任务系统
+celery==5.3.4
+redis==5.0.1
+kombu==5.3.4
+
+# 深度学习和音频处理（对齐文件1的版本）
+--extra-index-url https://download.pytorch.org/whl/cu121  # 统一 CUDA 12.1 源
+#torch==2.3.1
+#torchaudio==2.3.1
+librosa==0.10.2  # 升级到文件1的版本
+soundfile==0.12.1
+numpy==1.26.0  # transformers 4.40.1 的隐式要求
+scipy==1.11.4  # 兼容 librosa
+
+# HTTP客户端
+aiohttp==3.9.1
+httpx==0.25.2
+
+# 数据处理和序列化
+pandas==2.1.4  # 需兼容 numpy 1.26.0
+
+# 系统监控和性能
+psutil==5.9.6
+memory-profiler==0.61.0
+
+# 文件处理
+aiofiles==23.2.1
+
+# 压缩和序列化
+lz4==4.3.2
+
+# 时间和调度
+croniter==2.0.1
+python-crontab==3.0.0
+
+# 日志和监控
+structlog==23.2.0
+prometheus-client==0.19.0
+prometheus-fastapi-instrumentator==6.1.0
+
+# 开发和测试（无冲突，保持原样）
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
+# 环境配置
+python-dotenv==1.0.0
+
+# 其他工具
+click==8.1.7
+rich==13.7.1  # 升级到文件1的版本
+typer==0.9.0
+pydantic[email]  # 补充文件1未覆盖的额外功能

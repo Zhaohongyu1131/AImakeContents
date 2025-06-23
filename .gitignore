@@ -1,0 +1,122 @@
+# 依赖目录
+notgithub/
+node_modules/
+*/node_modules/
+**/node_modules/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+*.log.*
+
+
+# 临时文件
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# 数据库
+*.db
+*.sqlite
+*.sqlite3
+
+# 音频文件（测试生成的）
+*.wav
+*.mp3
+*.ogg
+test_audio/
+
+# 缓存目录
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore
+
+# 构建输出
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# 前端构建
+.next/
+out/
+.nuxt/
+.vuepress/dist/
+
+# 包管理器锁文件（保留package-lock.json但忽略yarn.lock）
+yarn.lock
+pnpm-lock.yaml
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 其他
+*.pid
+*.seed
+*.pid.lock 
+readme/PCM转MP3音频处理总结.md
+readme/克隆语音流式合成集成总结.md
+readme/前端实时播放功能完善总结.md
+readme/开发计划.md
+readme/流式合成调试指南.md
+readme/流式合成问题解决方案.md
+readme/豆包API流式合成测试总结.md
+readme/连接错误诊断与解决方案.md
+scripts/play_audio.py
+scripts/test_backend_direct.py
+scripts/test_doubao_api.py
+scripts/test_doubao_direct.py
+scripts/test_doubao_official_voices.py
+scripts/test_doubao_official.py
+scripts/test_doubao_simple.py
