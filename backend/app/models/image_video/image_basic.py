@@ -29,7 +29,7 @@ class ImageBasic(ModelBase):
     image_format = Column(String(20), nullable=True, comment="图像格式")
     
     # 生成信息
-    image_source_text_id = Column(Integer, ForeignKey("text_content_basic.content_id"), nullable=True, comment="源文本ID")
+    image_source_text_id = Column(Integer, ForeignKey("text_content_basic.text_id"), nullable=True, comment="源文本ID")
     image_generation_params = Column(JSONB, nullable=True, comment="生成参数")
     image_prompt = Column(Text, nullable=True, comment="生成提示词")
     image_negative_prompt = Column(Text, nullable=True, comment="负向提示词")

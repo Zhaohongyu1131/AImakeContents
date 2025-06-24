@@ -38,6 +38,7 @@ class UserAuthBasic(ModelBase):
     
     # 关系映射
     sessions = relationship("UserAuthSession", back_populates="user", cascade="all, delete-orphan")
+    profile = relationship("UserAuthProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         return f"<UserAuthBasic(user_id={self.user_id}, user_name='{self.user_name}', user_email='{self.user_email}')>"

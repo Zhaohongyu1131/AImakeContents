@@ -20,6 +20,7 @@ const TextContentList = React.lazy(() => import('@/pages/text/TextContentList'))
 const TextContentCreate = React.lazy(() => import('@/pages/text/TextContentCreate'))
 
 // 语音相关页面
+const VoiceWorkbenchPage = React.lazy(() => import('@/pages/voice-workbench/VoiceWorkbenchPage'))
 const VoiceTimbreList = React.lazy(() => import('@/pages/voice/timbre/VoiceTimbreList'))
 const VoiceAudioList = React.lazy(() => import('@/pages/voice/audio/VoiceAudioList'))
 
@@ -66,7 +67,8 @@ const AppRouter: React.FC = () => {
           
           {/* 语音内容模块 */}
           <Route path="voice">
-            <Route index element={<Navigate to="timbre" replace />} />
+            <Route index element={<Navigate to="workbench" replace />} />
+            <Route path="workbench" element={<VoiceWorkbenchPage />} />
             <Route path="timbre" element={<VoiceTimbreList />} />
             <Route path="audio" element={<VoiceAudioList />} />
           </Route>

@@ -8,7 +8,17 @@
       "Bash(pip install:*)",
       "Bash(alembic init:*)",
       "Bash(alembic revision:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(alembic upgrade:*)",
+      "Bash(python:*)",
+      "Bash(npm run build:*)",
+      "Bash(grep:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(PYTHONPATH=. python scripts/setup_database.py)",
+      "Bash(PGPASSWORD=datasayai123 createdb -h localhost -p 5433 -U datasayai datasay)",
+      "Bash(PYTHONPATH=. alembic revision --autogenerate -m \"Create complete database schema\")"
     ],
     "deny": []
   }

@@ -4,7 +4,9 @@ File Storage Models Module
 """
 
 from .file_storage_basic import FileStorageBasic
+from .file_storage_meta import FileStorageMeta
 
 __all__ = [
     "FileStorageBasic",
+    "FileStorageMeta",
 ]

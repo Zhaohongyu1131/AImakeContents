@@ -17,7 +17,7 @@ class HttpClient {
   private baseURL: string
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+    this.baseURL = (import.meta as any).env?.VITE_API_BASE_URL || '/api/v1'
     this.instance = this.createInstance()
     this.setupInterceptors()
   }

@@ -414,3 +414,82 @@ class FileStorageService(ServiceBase):
         """
         # TODO: 实现文件删除权限检查逻辑
         return True
+    
+    async def file_storage_service_save_bytes(
+        self,
+        file_bytes: bytes,
+        filename: str,
+        content_type: str,
+        user_id: int,
+        category: str = "generated",
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        保存字节数据为文件
+        [services][file_storage][save_bytes]
+        """
+        try:
+            # 生成唯一文件名
+            file_extension = Path(filename).suffix
+            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            
+            # 创建存储目录
+            today = datetime.now().strftime("%Y/%m/%d")
+            storage_dir = self.upload_path / today
+            storage_dir.mkdir(parents=True, exist_ok=True)
+            
+            # 保存文件
+            file_path = storage_dir / unique_filename
+            with open(file_path, "wb") as f:
+                f.write(file_bytes)
+            
+            # 创建文件记录
+            file_record = FileStorageBasic(
+                file_original_name=filename,
+                file_stored_name=unique_filename,
+                file_path=str(file_path.relative_to(self.upload_path)),
+                file_size=len(file_bytes),
+                file_type=content_type,
+                file_category=category,
+                file_upload_user_id=user_id,
+                file_created_time=datetime.utcnow(),
+                file_status="active"
+            )
+            
+            self.db.add(file_record)
+            await self.db.commit()
+            await self.db.refresh(file_record)
+            
+            # 保存元数据
+            if metadata:
+                file_meta = FileStorageMeta(
+                    file_id=file_record.file_id,
+                    meta_key="metadata",
+                    meta_json=metadata,
+                    meta_created_time=datetime.utcnow()
+                )
+                self.db.add(file_meta)
+                await self.db.commit()
+            
+            return {
+                "success": True,
+                "data": {
+                    "file_id": file_record.file_id,
+                    "filename": filename,
+                    "file_size": len(file_bytes),
+                    "file_type": content_type,
+                    "file_url": self.file_storage_service_get_file_url(file_record.file_id),
+                    "file_path": str(file_path)
+                }
+            }
+            
+        except Exception as e:
+            await self.db.rollback()
+            return {
+                "success": False,
+                "error": f"保存文件失败: {str(e)}"
+            }
+
+
+# 创建全局服务实例
+file_storage_service = FileStorageService

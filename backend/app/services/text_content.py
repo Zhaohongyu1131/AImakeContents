@@ -10,8 +10,9 @@ from sqlalchemy import select, and_, func, or_
 
 from app.services.base import ServiceBase
 from app.models.text_content.text_content_basic import TextContentBasic
-from app.models.text_content.text_content_analyse import TextContentAnalyse
-from app.models.text_content.text_content_template import TextContentTemplate
+from app.models.text_content.text_analyse_result import TextAnalyseResult
+from app.models.text_content.text_template_basic import TextTemplateBasic
+from app.services.text_generation_service import text_generation_service
 
 
 class TextContentService(ServiceBase):
@@ -34,6 +35,13 @@ class TextContentService(ServiceBase):
         content_type: str = "article",
         user_id: int = 1,
         template_id: Optional[int] = None,
+        source_prompt: Optional[str] = None,
+        generation_params: Optional[Dict[str, Any]] = None,
+        tags: Optional[List[str]] = None,
+        language: str = "zh-CN",
+        ai_model: Optional[str] = None,
+        ai_provider: Optional[str] = None,
+        generation_prompt: Optional[str] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -68,14 +76,13 @@ class TextContentService(ServiceBase):
             text_record = TextContentBasic(
                 text_title=title or f"文本内容 - {datetime.now().strftime('%Y%m%d_%H%M%S')}",
                 text_content=content,
-                text_type=content_type,
+                text_content_type=content_type,
+                text_language=language,
                 text_word_count=len(content),
-                text_character_count=len(content.replace(' ', '')),
                 text_template_id=template_id,
                 text_created_user_id=user_id,
-                text_created_time=datetime.utcnow(),
-                text_updated_time=datetime.utcnow(),
-                text_status="active"
+                text_status="active",
+                text_tags=tags
             )
             
             self.db.add(text_record)
@@ -104,9 +111,10 @@ class TextContentService(ServiceBase):
                     "text_id": text_record.text_id,
                     "title": text_record.text_title,
                     "content": text_record.text_content,
-                    "content_type": text_record.text_type,
+                    "content_type": text_record.text_content_type,
+                    "language": text_record.text_language,
                     "word_count": text_record.text_word_count,
-                    "character_count": text_record.text_character_count,
+                    "tags": text_record.text_tags,
                     "created_time": text_record.text_created_time
                 }
             }
@@ -124,6 +132,8 @@ class TextContentService(ServiceBase):
         content: Optional[str] = None,
         title: Optional[str] = None,
         user_id: int = 1,
+        tags: Optional[List[str]] = None,
+        language: Optional[str] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -407,15 +417,12 @@ class TextContentService(ServiceBase):
             )
             
             # 保存分析结果
-            analyse_record = TextContentAnalyse(
+            analyse_record = TextAnalyseResult(
                 text_id=text_id,
                 analyse_type=analyse_type,
                 analyse_result=analysis_result["result"],
-                analyse_summary=analysis_result.get("summary"),
                 analyse_score=analysis_result.get("score"),
-                analyse_created_user_id=user_id,
-                analyse_created_time=datetime.utcnow(),
-                analyse_status="completed"
+                analyse_created_time=datetime.utcnow()
             )
             
             self.db.add(analyse_record)
@@ -517,8 +524,8 @@ class TextContentService(ServiceBase):
         """
         try:
             # 获取模板
-            stmt = select(TextContentTemplate).where(
-                TextContentTemplate.template_id == template_id
+            stmt = select(TextTemplateBasic).where(
+                TextTemplateBasic.template_id == template_id
             )
             result = await self.db.execute(stmt)
             template = result.scalar_one_or_none()
@@ -558,9 +565,9 @@ class TextContentService(ServiceBase):
         [services][text_content][get_analyses]
         """
         try:
-            stmt = select(TextContentAnalyse).where(
-                TextContentAnalyse.text_id == text_id
-            ).order_by(TextContentAnalyse.analyse_created_time.desc())
+            stmt = select(TextAnalyseResult).where(
+                TextAnalyseResult.text_id == text_id
+            ).order_by(TextAnalyseResult.analyse_created_time.desc())
             
             result = await self.db.execute(stmt)
             analyses = result.scalars().all()
@@ -570,7 +577,6 @@ class TextContentService(ServiceBase):
                     "analyse_id": analysis.analyse_id,
                     "analyse_type": analysis.analyse_type,
                     "result": analysis.analyse_result,
-                    "summary": analysis.analyse_summary,
                     "score": analysis.analyse_score,
                     "created_time": analysis.analyse_created_time
                 }
@@ -592,3 +598,129 @@ class TextContentService(ServiceBase):
         """
         # TODO: 实现权限检查逻辑
         return True
+    
+    async def text_content_service_generate(
+        self,
+        prompt: str,
+        template_type: Optional[str] = None,
+        model_provider: str = "doubao",
+        user_id: int = 1,
+        save_result: bool = True,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        使用AI生成文本内容
+        [services][text_content][generate]
+        """
+        try:
+            # 如果指定了模板类型，使用模板生成
+            if template_type:
+                # 获取模板变量
+                variables = kwargs.get("variables", {})
+                result = await text_generation_service.text_generation_service_generate_with_template(
+                    template_type=template_type,
+                    variables=variables,
+                    model_provider=model_provider,
+                    **kwargs
+                )
+            else:
+                # 直接生成
+                result = await text_generation_service.text_generation_service_generate(
+                    prompt=prompt,
+                    model_provider=model_provider,
+                    **kwargs
+                )
+            
+            if not result["success"]:
+                return result
+            
+            generated_text = result["data"]["generated_text"]
+            
+            # 如果需要保存结果
+            if save_result:
+                save_result = await self.text_content_service_create(
+                    content=generated_text,
+                    title=kwargs.get("title", f"AI生成内容 - {datetime.now().strftime('%Y%m%d_%H%M%S')}"),
+                    content_type=kwargs.get("content_type", "ai_generated"),
+                    user_id=user_id,
+                    ai_model=result["data"]["model"],
+                    ai_provider=result["data"]["provider"],
+                    generation_prompt=prompt
+                )
+                
+                if save_result["success"]:
+                    return {
+                        "success": True,
+                        "data": {
+                            "text_id": save_result["data"]["text_id"],
+                            "generated_text": generated_text,
+                            "model": result["data"]["model"],
+                            "provider": result["data"]["provider"],
+                            "usage": result["data"].get("usage", {})
+                        }
+                    }
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Text generation failed: {str(e)}")
+            return {
+                "success": False,
+                "error": f"文本生成失败: {str(e)}"
+            }
+    
+    async def text_content_service_generate_batch(
+        self,
+        prompts: List[str],
+        model_provider: str = "doubao",
+        user_id: int = 1,
+        save_results: bool = True,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        批量生成文本内容
+        [services][text_content][generate_batch]
+        """
+        try:
+            # 调用批量生成服务
+            result = await text_generation_service.text_generation_service_generate_batch(
+                prompts=prompts,
+                model_provider=model_provider,
+                **kwargs
+            )
+            
+            if not result["success"]:
+                return result
+            
+            # 如果需要保存结果
+            if save_results:
+                saved_texts = []
+                for item in result["data"]["results"]:
+                    save_result = await self.text_content_service_create(
+                        content=item["generated_text"],
+                        title=f"批量生成 #{item['index'] + 1} - {datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                        content_type="ai_generated_batch",
+                        user_id=user_id,
+                        ai_model=model_provider,
+                        ai_provider=model_provider,
+                        generation_prompt=item["prompt"]
+                    )
+                    
+                    if save_result["success"]:
+                        saved_texts.append({
+                            "index": item["index"],
+                            "text_id": save_result["data"]["text_id"],
+                            "prompt": item["prompt"],
+                            "generated_text": item["generated_text"]
+                        })
+                
+                result["data"]["saved_texts"] = saved_texts
+            
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Batch text generation failed: {str(e)}")
+            return {
+                "success": False,
+                "error": f"批量文本生成失败: {str(e)}"
+            }

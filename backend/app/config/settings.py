@@ -52,6 +52,10 @@ class AppConfigSettings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     JWT_REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     
+    # 向后兼容的别名
+    SECRET_KEY: str = "your-super-secret-key-change-in-production"
+    ALGORITHM: str = "HS256"
+    
     # 文件存储配置
     FILE_UPLOAD_MAX_SIZE: int = 100 * 1024 * 1024  # 100MB
     FILE_STORAGE_PATH: str = "/tmp/datasay/storage"
@@ -69,7 +73,6 @@ class AppConfigSettings(BaseSettings):
     VOLCANO_API_BASE_URL: str = "https://openspeech.bytedance.com"
     
     # 安全配置
-    SECRET_KEY: str = "your-super-secret-key-change-in-production"
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "0.0.0.0"]
     
     # 日志配置
@@ -99,3 +102,6 @@ def app_config_get_settings() -> AppConfigSettings:
     [app][config][get_settings]
     """
     return AppConfigSettings()
+
+# 全局设置实例
+settings = app_config_get_settings()

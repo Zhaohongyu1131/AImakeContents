@@ -63,13 +63,11 @@ class UserAuthService(ServiceBase):
             # 创建新用户
             hashed_password = self.user_auth_service_hash_password(password)
             new_user = UserAuthBasic(
-                user_username=username,
+                user_name=username,
                 user_email=email,
                 user_password_hash=hashed_password,
-                user_type=user_type,
-                user_status="active",
-                user_created_time=datetime.utcnow(),
-                user_updated_time=datetime.utcnow()
+                user_role=user_type,
+                user_status="active"
             )
             
             self.db.add(new_user)
@@ -88,9 +86,9 @@ class UserAuthService(ServiceBase):
                 "success": True,
                 "data": {
                     "user_id": new_user.user_id,
-                    "username": new_user.user_username,
+                    "username": new_user.user_name,
                     "email": new_user.user_email,
-                    "user_type": new_user.user_type
+                    "user_type": new_user.user_role
                 }
             }
             
@@ -129,7 +127,7 @@ class UserAuthService(ServiceBase):
             
             # 生成访问令牌
             access_token = self.user_auth_service_create_access_token(
-                data={"sub": str(user.user_id), "username": user.user_username}
+                data={"sub": str(user.user_id), "username": user.user_name}
             )
             
             # 创建会话记录
@@ -139,7 +137,7 @@ class UserAuthService(ServiceBase):
                 session_login_ip=login_ip,
                 session_login_time=datetime.utcnow(),
                 session_expires_at=datetime.utcnow() + timedelta(
-                    minutes=self.settings.ACCESS_TOKEN_EXPIRE_MINUTES
+                    minutes=self.settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
                 ),
                 session_status="active"
             )
@@ -161,12 +159,12 @@ class UserAuthService(ServiceBase):
                 "data": {
                     "access_token": access_token,
                     "token_type": "bearer",
-                    "expires_in": self.settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                    "expires_in": self.settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60,
                     "user": {
                         "user_id": user.user_id,
-                        "username": user.user_username,
+                        "username": user.user_name,
                         "email": user.user_email,
-                        "user_type": user.user_type
+                        "user_type": user.user_role
                     }
                 }
             }
@@ -233,7 +231,7 @@ class UserAuthService(ServiceBase):
         根据用户名获取用户
         [services][user_auth][get_by_username]
         """
-        stmt = select(UserAuthBasic).where(UserAuthBasic.user_username == username)
+        stmt = select(UserAuthBasic).where(UserAuthBasic.user_name == username)
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
     
@@ -299,14 +297,14 @@ class UserAuthService(ServiceBase):
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(
-                minutes=self.settings.ACCESS_TOKEN_EXPIRE_MINUTES
+                minutes=self.settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
             )
         
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(
             to_encode,
-            self.settings.SECRET_KEY,
-            algorithm=self.settings.ALGORITHM
+            self.settings.JWT_SECRET_KEY,
+            algorithm=self.settings.JWT_ALGORITHM
         )
         return encoded_jwt
     
@@ -321,8 +319,8 @@ class UserAuthService(ServiceBase):
         try:
             payload = jwt.decode(
                 token,
-                self.settings.SECRET_KEY,
-                algorithms=[self.settings.ALGORITHM]
+                self.settings.JWT_SECRET_KEY,
+                algorithms=[self.settings.JWT_ALGORITHM]
             )
             user_id: str = payload.get("sub")
             username: str = payload.get("username")

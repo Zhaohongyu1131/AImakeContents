@@ -32,7 +32,7 @@ class VideoBasic(ModelBase):
     video_bitrate = Column(Integer, nullable=True, comment="比特率")
     
     # 生成信息
-    video_source_text_id = Column(Integer, ForeignKey("text_content_basic.content_id"), nullable=True, comment="源文本ID")
+    video_source_text_id = Column(Integer, ForeignKey("text_content_basic.text_id"), nullable=True, comment="源文本ID")
     video_source_image_id = Column(Integer, ForeignKey("image_basic.image_id"), nullable=True, comment="源图像ID")
     video_source_audio_id = Column(Integer, ForeignKey("voice_audio_basic.audio_id"), nullable=True, comment="源音频ID")
     video_generation_params = Column(JSONB, nullable=True, comment="生成参数")

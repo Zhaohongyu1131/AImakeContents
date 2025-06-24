@@ -50,8 +50,9 @@ const AppSider: React.FC = () => {
       createMenuItem('/text/content/create', '创建文本'),
     ]),
     
-    createMenuItem('voice', '语音内容', <SoundOutlined />, [
-      createMenuItem('/voice/timbre', '音色管理'),
+    createMenuItem('voice', '语音服务', <SoundOutlined />, [
+      createMenuItem('/voice/workbench', '语音工作台'),
+      createMenuItem('/voice/timbre', '高级管理'),
       createMenuItem('/voice/audio', '音频管理'),
     ]),
     

@@ -30,7 +30,7 @@ class VoiceAudioBasic(ModelBase):
     audio_bitrate = Column(Integer, nullable=True, comment="比特率")
     
     # 合成信息
-    audio_source_text_id = Column(Integer, ForeignKey("text_content_basic.content_id"), nullable=True, comment="源文本ID")
+    audio_source_text_id = Column(Integer, ForeignKey("text_content_basic.text_id"), nullable=True, comment="源文本ID")
     audio_timbre_id = Column(Integer, ForeignKey("voice_timbre_basic.timbre_id"), nullable=True, comment="音色ID")
     audio_synthesis_params = Column(JSONB, nullable=True, comment="合成参数")
     

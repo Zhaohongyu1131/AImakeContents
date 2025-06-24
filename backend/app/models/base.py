@@ -15,10 +15,6 @@ class ModelBase(DatabaseBase):
     """
     __abstract__ = True
     
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    created_time = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_time = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    
     @declared_attr
     def __tablename__(cls) -> str:
         """
@@ -26,6 +22,16 @@ class ModelBase(DatabaseBase):
         遵循 [business_module][data_object][attribute] 命名规范
         """
         return cls.__name__.lower()
+
+class ModelBaseWithTimestamp(ModelBase):
+    """
+    包含时间戳的基础模型类
+    [model][base][with_timestamp]
+    """
+    __abstract__ = True
+    
+    created_time = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_time = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
 class ModelBaseWithUser(ModelBase):
     """

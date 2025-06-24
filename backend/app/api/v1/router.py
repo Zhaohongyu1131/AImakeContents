@@ -10,6 +10,9 @@ from app.api.v1.file_storage import file_storage_router_get
 from app.api.v1.text_content import text_content_router_get
 from app.api.v1.voice_timbre import voice_timbre_router_get
 from app.api.v1.voice_audio import voice_audio_router_get
+from app.api.v1.doubao import doubao_router_get
+from app.api.v1.voice_unified import voice_unified_router_get
+from app.api.v1.image_video.image_video_router import image_video_router_get
 
 def api_v1_router_get() -> APIRouter:
     """
@@ -67,8 +70,28 @@ def api_v1_router_get() -> APIRouter:
         tags=["音频管理"]
     )
     
+    # 统一语音服务路由（推荐使用）
+    router.include_router(
+        voice_unified_router_get(),
+        prefix="/voice",
+        tags=["统一语音服务"]
+    )
+    
+    # 豆包API路由（保留兼容性）
+    router.include_router(
+        doubao_router_get(),
+        prefix="/doubao",
+        tags=["豆包AI服务（兼容）"]
+    )
+    
+    # 图像视频模块路由
+    router.include_router(
+        image_video_router_get(),
+        prefix="/image-video",
+        tags=["图像视频"]
+    )
+    
     # TODO: 添加其他业务模块路由
-    # router.include_router(image_video_router_get(), prefix="/image", tags=["图像视频"])
     # router.include_router(mixed_content_router_get(), prefix="/mixed", tags=["混合内容"])
     
     return router

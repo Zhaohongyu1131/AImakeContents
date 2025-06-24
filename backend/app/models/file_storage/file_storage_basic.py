@@ -40,6 +40,7 @@ class FileStorageBasic(ModelBase):
     
     # 关系映射
     created_user = relationship("UserAuthBasic", foreign_keys=[file_created_user_id])
+    meta_list = relationship("FileStorageMeta", back_populates="file_storage")
     
     def __repr__(self) -> str:
         return f"<FileStorageBasic(file_id={self.file_id}, file_name='{self.file_name}', file_type='{self.file_type}')>"
