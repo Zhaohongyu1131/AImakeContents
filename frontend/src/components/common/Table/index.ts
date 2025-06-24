@@ -1,0 +1,1 @@
+/**\n * Table Component Export\n * 表格组件导出 - [components][common][table][index]\n */\n\nexport { Table as default } from './Table';\nexport { Table } from './Table';"

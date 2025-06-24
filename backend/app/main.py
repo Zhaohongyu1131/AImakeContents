@@ -17,6 +17,12 @@ from app.middleware import (
     logging_middleware_add,
     auth_middleware_add
 )
+from app.core.error_handlers import register_error_handlers
+from app.core.logging_config import setup_logging
+from app.core.cache_config import cache_config_initialize, cache_config_cleanup
+from app.core.api_docs import api_docs_setup_documentation
+from app.middleware.request_logging import add_request_logging_middleware
+from app.middleware.rate_limiter import add_rate_limiter_middleware, RateLimiterConfig
 from app.services.voice_platform_manager import voice_platform_manager
 from app.services.voice_platform_manager import VoicePlatformType
 
@@ -89,6 +95,9 @@ def app_main_create() -> FastAPI:
     创建FastAPI应用实例
     [app][main][create]
     """
+    # 初始化日志配置
+    setup_logging()
+    
     settings = app_config_get_settings()
     
     app = FastAPI(
@@ -100,8 +109,25 @@ def app_main_create() -> FastAPI:
         redoc_url=f"{settings.API_V1_PREFIX}/redoc",
     )
     
+    # 注册错误处理器
+    register_error_handlers(app)
+    
     # 添加中间件（注意顺序很重要）
     cors_middleware_add(app)
+    
+    # 添加限流中间件
+    add_rate_limiter_middleware(
+        app,
+        default_config=RateLimiterConfig(
+            requests_per_minute=60,
+            requests_per_hour=1000,
+            requests_per_day=10000
+        )
+    )
+    
+    # 添加请求日志中间件
+    add_request_logging_middleware(app)
+    
     logging_middleware_add(app)
     auth_middleware_add(app)
     error_handler_add(app)
@@ -109,10 +135,14 @@ def app_main_create() -> FastAPI:
     # 注册API路由
     app.include_router(api_router)
     
+    # 设置API文档
+    api_docs_setup_documentation(app)
+    
     # 添加启动事件
     @app.on_event("startup")
     async def startup_event():
         """应用启动事件"""
+        await cache_config_initialize()
         await app_main_initialize_platforms()
     
     # 添加关闭事件
@@ -120,6 +150,7 @@ def app_main_create() -> FastAPI:
     async def shutdown_event():
         """应用关闭事件"""
         await voice_platform_manager.voice_platform_manager_cleanup_all_platforms()
+        await cache_config_cleanup()
     
     return app
 

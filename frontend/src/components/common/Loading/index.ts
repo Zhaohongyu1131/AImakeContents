@@ -1,0 +1,1 @@
+/**\n * Loading Component Export\n * 加载组件导出 - [components][common][loading][index]\n */\n\nexport { Loading as default } from './Loading';\nexport { Loading } from './Loading';"

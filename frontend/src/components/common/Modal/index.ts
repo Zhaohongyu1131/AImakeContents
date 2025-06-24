@@ -1,0 +1,1 @@
+/**\n * Modal Component Export\n * 模态框组件导出 - [components][common][modal][index]\n */\n\nexport { Modal as default } from './Modal';\nexport { Modal } from './Modal';"

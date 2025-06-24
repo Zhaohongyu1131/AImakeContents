@@ -1,0 +1,1 @@
+/**\n * Button Component Export\n * 按钮组件导出 - [components][common][button][index]\n */\n\nexport { Button as default } from './Button';\nexport { Button } from './Button';"
