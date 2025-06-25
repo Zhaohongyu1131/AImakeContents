@@ -16,22 +16,25 @@ const LoginPage = React.lazy(() => import('@/pages/auth/LoginPage'))
 const RegisterPage = React.lazy(() => import('@/pages/auth/RegisterPage'))
 
 // 文本相关页面
-const TextContentList = React.lazy(() => import('@/pages/text/TextContentList'))
-const TextContentCreate = React.lazy(() => import('@/pages/text/TextContentCreate'))
+const TextContentList = React.lazy(() => import('@/pages/text_content/TextContentList'))
+const TextContentCreate = React.lazy(() => import('@/pages/text_content/TextContentCreate'))
 
 // 语音相关页面
-const VoiceWorkbenchPage = React.lazy(() => import('@/pages/voice-workbench/VoiceWorkbenchPage'))
-const VoiceTimbreList = React.lazy(() => import('@/pages/voice/timbre/VoiceTimbreList'))
-const VoiceAudioList = React.lazy(() => import('@/pages/voice/audio/VoiceAudioList'))
+const VoiceWorkbenchPage = React.lazy(() => import('@/pages/voice_service/VoiceWorkbenchPage'))
+const VoiceTimbreList = React.lazy(() => import('@/pages/voice_service/timbre/VoiceTimbreList'))
+const VoiceAudioList = React.lazy(() => import('@/pages/voice_service/audio/VoiceAudioList'))
 
 // 图像相关页面
-const ImageContentList = React.lazy(() => import('@/pages/image/ImageContentList'))
+const ImageContentList = React.lazy(() => import('@/pages/image_service/ImageContentList'))
 
 // 混合内容页面
 const MixallContentList = React.lazy(() => import('@/pages/mixall/MixallContentList'))
 
 // 设置页面
 const SettingsPage = React.lazy(() => import('@/pages/settings/SettingsPage'))
+
+// 用户个人中心页面
+const UserProfileWorkspace = React.lazy(() => import('@/pages/user_profile/UserProfileWorkspace'))
 
 // 错误页面
 const NotFoundPage = React.lazy(() => import('@/pages/error/NotFoundPage'))
@@ -87,6 +90,9 @@ const AppRouter: React.FC = () => {
           
           {/* 设置页面 */}
           <Route path="settings" element={<SettingsPage />} />
+          
+          {/* 用户个人中心 */}
+          <Route path="profile" element={<UserProfileWorkspace />} />
         </Route>
 
         {/* 404页面 */}

@@ -5,6 +5,7 @@
 
 import React from 'react'
 import { Layout, Button, Space, Avatar, Dropdown, Typography, theme } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { 
   MenuFoldOutlined, 
   MenuUnfoldOutlined,
@@ -22,6 +23,7 @@ const { Header } = Layout
 const { Text } = Typography
 
 const AppHeader: React.FC = () => {
+  const navigate = useNavigate()
   const { 
     theme: appTheme, 
     layout, 
@@ -56,10 +58,10 @@ const AppHeader: React.FC = () => {
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     switch (key) {
       case 'profile':
-        // TODO: 跳转到个人资料页面
+        navigate('/profile')
         break
       case 'settings':
-        // TODO: 跳转到设置页面
+        navigate('/settings')
         break
       case 'logout':
         // TODO: 执行登出操作

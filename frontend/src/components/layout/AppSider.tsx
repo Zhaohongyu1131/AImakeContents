@@ -13,6 +13,7 @@ import {
   PictureOutlined,
   AppstoreOutlined,
   SettingOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 
@@ -64,6 +65,7 @@ const AppSider: React.FC = () => {
       createMenuItem('/mixall/content', '作品管理'),
     ]),
     
+    createMenuItem('/profile', '个人中心', <UserOutlined />),
     createMenuItem('/settings', '系统设置', <SettingOutlined />),
   ]
 

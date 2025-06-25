@@ -18,7 +18,8 @@
       "Bash(cp:*)",
       "Bash(PYTHONPATH=. python scripts/setup_database.py)",
       "Bash(PGPASSWORD=datasayai123 createdb -h localhost -p 5433 -U datasayai datasay)",
-      "Bash(PYTHONPATH=. alembic revision --autogenerate -m \"Create complete database schema\")"
+      "Bash(PYTHONPATH=. alembic revision --autogenerate -m \"Create complete database schema\")",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }
